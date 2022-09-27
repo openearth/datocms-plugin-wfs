@@ -3,12 +3,17 @@ import CssBaseline from '@mui/material/CssBaseline'
 import EnhancedTable from './EnhancedTable'
 import { DescribeFeatureType, ReadFeatureProperties } from '../lib/wfs-helpers'
 
-export default function PropertiesTable() {
+
+export default function PropertiesTable({ formValues } ) {
   const columns = 
      [
       {
         Header: 'Property',
         accessor: 'property',
+      },
+      {
+        Header: 'Worth',
+        accessor: 'worth',
       },
       {
         Header: 'Keywords',
@@ -20,24 +25,23 @@ export default function PropertiesTable() {
 
   //call describeFeatureType from wfs-helpers
 
-  const url = "https://marineprojects.openearth.eu/geoserver/ihm_etl/ows"
-  const layer = "ihm_etl:biologie"
-  const [properties, setProperties] = React.useState({})
+  const {download_layer, layer, url} = formValues
+  const [data, setData] = React.useState([])
   const getProperties = () => {
     
-    DescribeFeatureType(url, layer)
+    DescribeFeatureType({url, layer, downloadLayer:download_layer})
       .then(response => {
-        setProperties(ReadFeatureProperties(response.data))
+        setData(ReadFeatureProperties(response.data))
       })
       .catch(() => undefined) 
   }
   useEffect(() => {
     getProperties()
   }, [])
-  const [data, setData] = React.useState( [{property: "biotaxon", keywords: ["Chaetoceros lorenzianus", "Micracanthodinium"]}, {property: "Sample", keywords: ["key1", "key2"]}])
+  //const [data, setData] = React.useState( [{property: "biotaxon", keywords: ["Chaetoceros lorenzianus", "Micracanthodinium"]}, {property: "Sample", keywords: ["key1", "key2"]}])
   const [skipPageReset, setSkipPageReset] = React.useState(false)
 
-
+  console.log(data)
   const updateMyData = (rowIndex, columnId, value) => {
     // We also turn on the flag to not reset the page
     setSkipPageReset(true)
@@ -55,7 +59,6 @@ export default function PropertiesTable() {
   }
   return <div> 
       <CssBaseline />
-      {console.log(properties)}
         <EnhancedTable
           columns={columns}
           data={data}

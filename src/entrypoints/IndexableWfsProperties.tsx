@@ -8,7 +8,8 @@ type Props = {
 
 
 export default function IndexableWfsProperties({ ctx }: Props) {
-  return <Canvas ctx={ctx}><PropertiesTable/></Canvas>
+  console.log(ctx.fieldPath)
+  return <Canvas ctx={ctx}><PropertiesTable formValues={ctx.formValues}/></Canvas>
 }
 
 

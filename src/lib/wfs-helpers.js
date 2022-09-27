@@ -20,27 +20,25 @@ function BuildGeoServerUrl({ url, service, request, encode = true, width = 256, 
   excludes geom
 */
 export function ReadFeatureProperties(describeFeatureTypeResponse) {
-  console.log('describeFeatureTypeResponse', describeFeatureTypeResponse)
+ 
   const { featureTypes } = describeFeatureTypeResponse
   const properties = featureTypes[0].properties
   
   const filteredProperties = properties.filter((property)=> 
-                                property.type.includes('xsd')).map(({ name, type })=>  {
-                                                                  return { name, type }
-})
+                                property.type.includes('xsd:string'))
+                                .map(({ name })=>  { return { property: name, worth: false, keywords: [] }})
                                                                                       
-
   return filteredProperties
   
 }
-export async function DescribeFeatureType (url, layer) {
+export async function DescribeFeatureType ({url, layer, downloadLayer}) {
   
   const geoServerUrl = await BuildGeoServerUrl({
     url,
     request: 'describeFeatureType',
     service: 'WFS',
     outputFormat: 'application/json',
-    typenames: layer,
+    typenames: downloadLayer ? downloadLayer : layer,
   })
 
   return axios.get(geoServerUrl)
