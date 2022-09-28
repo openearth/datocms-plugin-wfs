@@ -18,22 +18,27 @@ import {
   useTable,
 } from 'react-table'
 
+
 const IndeterminateCheckbox = React.forwardRef(
   ({ indeterminate, ...rest }, ref) => {
+    
     const defaultRef = React.useRef()
     const resolvedRef = ref || defaultRef
-
+    
     React.useEffect(() => {
       resolvedRef.current.indeterminate = indeterminate
     }, [resolvedRef, indeterminate])
 
     return (
       <>
-        <Checkbox ref={resolvedRef} {...rest} />
+        <Checkbox ref={resolvedRef} {...rest}  />
       </>
     )
   }
 )
+
+
+
 
 const inputStyle = {
   padding: 0,
@@ -94,23 +99,30 @@ const defaultColumn = {
   Cell: EditableCell,
 }
 
+
 const EnhancedTable = ({
   columns,
   data,
   setData,
   updateMyData,
   skipPageReset,
+  defaultIndexableProperties,
+  updateSelectedRowIds,
+  updateWormChoice,
 }) => {
+
+  const [wormSelectedRow, setWormSelectedRow] = React.useState('')
   const {
     getTableProps,
     headerGroups,
     prepareRow,
     page,
-    state: {  selectedRowIds },
+    state: {  selectedRowIds }, 
   } = useTable(
     {
       columns,
       data,
+      initialState: defaultIndexableProperties,
       defaultColumn,
       autoResetPage: !skipPageReset,
       // updateMyData isn't part of the API, but
@@ -120,7 +132,7 @@ const EnhancedTable = ({
       // cell renderer!
       updateMyData,
     },
-   
+    
     useSortBy,
     usePagination,
     useRowSelect,
@@ -130,16 +142,8 @@ const EnhancedTable = ({
         {
           id: 'selection',
           // The header can use the table's getToggleAllRowsSelectedProps method
-          // to render a checkbox.  Pagination is a problem since this will select all
-          // rows even though not all rows are on the current page.  The solution should
-          // be server side pagination.  For one, the clients should not download all
-          // rows in most cases.  The client should only download data for the current page.
-          // In that case, getToggleAllRowsSelectedProps works fine.
-          Header: ({ getToggleAllRowsSelectedProps }) => (
-            <div>
-              <IndeterminateCheckbox {...getToggleAllRowsSelectedProps()} />
-            </div>
-          ),
+          // to render a checkbox. 
+          Header: '',
           // The cell can use the individual row's getToggleRowSelectedProps method
           // to the render a checkbox
           Cell: ({ row }) => (
@@ -148,12 +152,27 @@ const EnhancedTable = ({
             </div>
           ),
         },
+        {
+          id: 'wormsSelection',
+          // The header can use the table's getToggleAllRowsSelectedProps method
+          // to render a checkbox. 
+          Header:'Worms',
+          // The cell can use the individual row's getToggleRowSelectedProps method
+          // to the render a checkbox
+          Cell: ({ row }) => (
+            <div>
+              <Checkbox onChange={(e) => (setWormSelectedRow(row.id))}/>
+            </div>
+          ),
+        },
         ...columns,
+
       ])
     }
   )
-
-
+  // *** Update selections *** 
+  updateWormChoice(wormSelectedRow)
+  updateSelectedRowIds(selectedRowIds)
 
   const removeByIndexs = (array, indexs) =>
     array.filter((_, i) => !indexs.includes(i))
@@ -174,7 +193,6 @@ const EnhancedTable = ({
   // Render the UI for your table
   return (
     <TableContainer>
-     
       <MaUTable {...getTableProps()}>
         <TableHead>
           {headerGroups.map(headerGroup => (

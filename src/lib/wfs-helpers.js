@@ -31,6 +31,10 @@ export function ReadFeatureProperties(describeFeatureTypeResponse) {
   return filteredProperties
   
 }
+
+/* 
+  Function that creates the describeFeatureType request
+*/
 export async function DescribeFeatureType ({url, layer, downloadLayer}) {
   
   const geoServerUrl = await BuildGeoServerUrl({
@@ -39,6 +43,23 @@ export async function DescribeFeatureType ({url, layer, downloadLayer}) {
     service: 'WFS',
     outputFormat: 'application/json',
     typenames: downloadLayer ? downloadLayer : layer,
+  })
+
+  return axios.get(geoServerUrl)
+}
+
+/* 
+  Function that creates the getFeature request based on the propertyName
+*/
+export async function GetFeaturePropertyKeywords ({url, layer, downloadLayer, propertyName}) {
+  
+  const geoServerUrl = await BuildGeoServerUrl({
+    url,
+    request: 'getFeature',
+    service: 'WFS',
+    outputFormat: 'application/json',
+    typenames: downloadLayer ? downloadLayer : layer,
+    propertyName,
   })
 
   return axios.get(geoServerUrl)
