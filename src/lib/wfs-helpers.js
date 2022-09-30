@@ -26,8 +26,8 @@ export function ReadFeatureProperties(describeFeatureTypeResponse) {
   
   const filteredProperties = properties.filter((property)=> 
                                 property.type.includes('xsd:string'))
-                                .map(({ name })=>  { return { property: name, worth: false, keywords: [] }})
-                                                                                      
+                                .map(({ name })=>  { return { property: name, worms: false, keywords: [] }})
+                                                                                    
   return filteredProperties
   
 }
@@ -63,4 +63,20 @@ export async function GetFeaturePropertyKeywords ({url, layer, downloadLayer, pr
   })
 
   return axios.get(geoServerUrl)
+}
+
+/* 
+  Function that reads the resposne of the GetFeature property
+  Returns an array with the unique keywords of the property
+*/
+export function ReadKeywordsFromWfsResponse(response, property) {
+  
+  if (!response) {
+    return []
+  }
+  const {features} = response
+  const keywords  = features.map(({properties}) => {
+  return properties[property]
+  }) 
+  return [ ...new Set(keywords) ]
 }

@@ -38,8 +38,6 @@ const IndeterminateCheckbox = React.forwardRef(
 )
 
 
-
-
 const inputStyle = {
   padding: 0,
   margin: 0,
@@ -47,12 +45,12 @@ const inputStyle = {
   background: 'transparent',
 }
 
-// Create an editable cell renderer
+
 const EditableCell = ({
   value: initialValue,
   row: { index },
   column: { id },
-  updateMyData, // This is a custom function that we supplied to our table instance
+  updateMyData, 
 }) => {
   // We need to keep and update the state of the cell normally
   const [value, setValue] = React.useState(initialValue)
@@ -106,7 +104,7 @@ const EnhancedTable = ({
   setData,
   updateMyData,
   skipPageReset,
-  defaultIndexableProperties,
+  defaultIndexableProperties, //default checked indeces
   updateSelectedRowIds,
   updateWormChoice,
 }) => {
@@ -161,7 +159,8 @@ const EnhancedTable = ({
           // to the render a checkbox
           Cell: ({ row }) => (
             <div>
-              <Checkbox onChange={(e) => (setWormSelectedRow(row.id))}/>
+              {/*  {console.log(data)} */}
+              <Checkbox checked={false} onChange={(e) => (setWormSelectedRow(row.id))}/>
             </div>
           ),
         },
@@ -173,22 +172,6 @@ const EnhancedTable = ({
   // *** Update selections *** 
   updateWormChoice(wormSelectedRow)
   updateSelectedRowIds(selectedRowIds)
-
-  const removeByIndexs = (array, indexs) =>
-    array.filter((_, i) => !indexs.includes(i))
-
-  const deleteUserHandler = event => {
-    const newData = removeByIndexs(
-      data,
-      Object.keys(selectedRowIds).map(x => parseInt(x, 10))
-    )
-    setData(newData)
-  }
-
-  const addUserHandler = user => {
-    const newData = data.concat([user])
-    setData(newData)
-  }
 
   // Render the UI for your table
   return (

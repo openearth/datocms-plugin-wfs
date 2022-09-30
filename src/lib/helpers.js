@@ -1,8 +1,8 @@
-export function ExtractSelectedRowIds(indexableProperties) {
-  if (!indexableProperties.length) {
+export function ExtractSelectedRowIds(pluginProperties) {
+  if (!pluginProperties.length) {
     return 
   }
-  const indeces = indexableProperties.map(({index}) => {
+  const indeces = pluginProperties.map(({index}) => {
     const selectedRow ={}
     selectedRow[index] = true
     return selectedRow
@@ -12,4 +12,14 @@ export function ExtractSelectedRowIds(indexableProperties) {
     selectedRowIds: Object.assign({}, ...indeces)
   }  
 }
+
+export function ExtractInitialSelectedWorms(pluginProperties) {
+    if (!pluginProperties.length) {
+    return 
+  }
+
+  return pluginProperties.map(({worms}) => worms)
+}
+
+
 
