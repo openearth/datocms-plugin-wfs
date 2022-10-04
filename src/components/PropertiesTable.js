@@ -2,7 +2,7 @@ import React, {useEffect} from 'react'
 import CssBaseline from '@mui/material/CssBaseline'
 import EnhancedTable from './EnhancedTable'
 import { DescribeFeatureType, GetFeaturePropertyKeywords, ReadFeatureProperties, ReadKeywordsFromWfsResponse } from '../lib/wfs-helpers'
-import { ExtractSelectedRowIds, ExtractInitialSelectedWorms } from '../lib/helpers'
+import { ExtractInitialSelectedRowsObject, ExtractInitialSelectedWormsValues, ExtractSelectedRowIds } from '../lib/helpers'
 
 
 export default function PropertiesTable({ formValues } ) {
@@ -22,8 +22,13 @@ export default function PropertiesTable({ formValues } ) {
   const initialPluginProperties = JSON.parse(indexable_wfs_properties)
   
   //Default indexed rows
-  const initialSelectedRows = ExtractSelectedRowIds(initialPluginProperties) 
-  const initialSelectedWorms = ExtractInitialSelectedWorms(initialPluginProperties)
+  /*   initialSelectedRows example:  {'selectedRowIds': {
+                                                          2:true 
+                                                          4: true   }}
+   */
+
+  const initialSelectedRows = ExtractInitialSelectedRowsObject(initialPluginProperties)   
+  const initialSelectedWorms = ExtractInitialSelectedWormsValues(initialPluginProperties)
 
   const [data, setData] = React.useState([])
   const getProperties = () => {
@@ -55,20 +60,17 @@ export default function PropertiesTable({ formValues } ) {
     )
   }
 
- //TODO: fix it does't pass in the if statement
-  const initialSelectedRowsIdsArray = Object.keys(initialSelectedRows)
+  // set in the data the worms=true values
+  const initialSelectedRowIds = ExtractSelectedRowIds(initialSelectedRows)
   data.forEach((dataRow, index)=>{
-    if (initialSelectedRowsIdsArray.includes(index.toString())){
-      console.log(initialSelectedWorms[index])
-      dataRow.worms = initialSelectedWorms[index]
+    if (Object.keys(initialSelectedRowIds).includes(index.toString())){   
+      dataRow.worms = initialSelectedRowIds[index]
     }
-    console.log(data)
+  
   })
 
   const updateSelectedRowIds = (selectedRowIds) => {
-    
     const selectedRowsIdsArray = Object.keys(selectedRowIds)
-    
     data.forEach((dataRow, index) => {
       const {property} = dataRow
      
@@ -83,10 +85,10 @@ export default function PropertiesTable({ formValues } ) {
     
     
   }
-  const updateWormChoice = (wormChoice) => {
-    
+  const updateWormChoice = (wormsChoice) => {
+    console.log('wormsChoice as it was chosen from the user', wormsChoice)
   }
-  console.log(data)
+  
   return <div> 
       <CssBaseline />
         <EnhancedTable

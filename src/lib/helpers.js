@@ -1,4 +1,4 @@
-export function ExtractSelectedRowIds(pluginProperties) {
+export function ExtractInitialSelectedRowsObject(pluginProperties) {
   if (!pluginProperties.length) {
     return 
   }
@@ -13,12 +13,20 @@ export function ExtractSelectedRowIds(pluginProperties) {
   }  
 }
 
-export function ExtractInitialSelectedWorms(pluginProperties) {
+export function ExtractInitialSelectedWormsValues(pluginProperties) {
     if (!pluginProperties.length) {
     return 
   }
 
   return pluginProperties.map(({worms}) => worms)
+}
+
+export function ExtractSelectedRowIds (selectedRowsObject) {
+  if (!selectedRowsObject) {
+    return []
+  }
+  const {selectedRowIds} = selectedRowsObject
+  return selectedRowIds
 }
 
 

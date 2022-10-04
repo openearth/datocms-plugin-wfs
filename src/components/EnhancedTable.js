@@ -160,7 +160,7 @@ const EnhancedTable = ({
           Cell: ({ row }) => (
             <div>
               {/*  {console.log(data)} */}
-              <Checkbox checked={false} onChange={(e) => (setWormSelectedRow(row.id))}/>
+              <Checkbox defaultChecked={data[row.id].worms} onChange={(e) => (setWormSelectedRow(row.id))}/>
             </div>
           ),
         },
