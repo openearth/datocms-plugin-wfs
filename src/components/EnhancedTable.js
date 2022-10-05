@@ -18,26 +18,6 @@ import {
   useTable,
 } from 'react-table'
 
-
-const IndeterminateCheckbox = React.forwardRef(
-  ({ indeterminate, ...rest }, ref) => {
-    
-    const defaultRef = React.useRef()
-    const resolvedRef = ref || defaultRef
-    
-    React.useEffect(() => {
-      resolvedRef.current.indeterminate = indeterminate
-    }, [resolvedRef, indeterminate])
-
-    return (
-      <>
-        <Checkbox ref={resolvedRef} {...rest}  />
-      </>
-    )
-  }
-)
-
-
 const inputStyle = {
   padding: 0,
   margin: 0,
@@ -49,8 +29,7 @@ const inputStyle = {
 const EditableCell = ({
   value: initialValue,
   row: { index },
-  column: { id },
-  updateMyData, 
+  column: { id }, 
 }) => {
   // We need to keep and update the state of the cell normally
   const [value, setValue] = React.useState(initialValue)
@@ -59,10 +38,6 @@ const EditableCell = ({
     setValue(e.target.value)
   }
 
-  // We'll only update the external data when the input is blurred
-  const onBlur = () => {
-    updateMyData(index, id, value)
-  }
 
   // If the initialValue is changed externall, sync it up with our state
   React.useEffect(() => {
@@ -74,7 +49,6 @@ const EditableCell = ({
       style={inputStyle}
       value={value}
       onChange={onChange}
-      onBlur={onBlur}
     />
   )
 }
@@ -89,7 +63,6 @@ EditableCell.propTypes = {
   column: PropTypes.shape({
     id: PropTypes.number.isRequired,
   }),
-  updateMyData: PropTypes.func.isRequired,
 }
 
 // Set our editable cell renderer as the default Cell renderer
@@ -102,33 +75,22 @@ const EnhancedTable = ({
   columns,
   data,
   setData,
-  updateMyData,
-  skipPageReset,
-  defaultIndexableProperties, //default checked indeces
-  updateSelectedRowIds,
-  updateWormChoice,
+  updateIndexedRow,
+  updateWormSelectedRow, 
 }) => {
 
-  const [wormSelectedRow, setWormSelectedRow] = React.useState('')
+
   const {
     getTableProps,
     headerGroups,
     prepareRow,
     page,
-    state: {  selectedRowIds }, 
   } = useTable(
     {
       columns,
       data,
-      initialState: defaultIndexableProperties,
+      //initialState: indexedProperties,
       defaultColumn,
-      autoResetPage: !skipPageReset,
-      // updateMyData isn't part of the API, but
-      // anything we put into these options will
-      // automatically be available on the instance.
-      // That way we can call this function from our
-      // cell renderer!
-      updateMyData,
     },
     
     useSortBy,
@@ -141,12 +103,12 @@ const EnhancedTable = ({
           id: 'selection',
           // The header can use the table's getToggleAllRowsSelectedProps method
           // to render a checkbox. 
-          Header: '',
+          Header: 'Indexed',
           // The cell can use the individual row's getToggleRowSelectedProps method
           // to the render a checkbox
-          Cell: ({ row }) => (
+          Cell: ({ row }) => (     
             <div>
-              <IndeterminateCheckbox {...row.getToggleRowSelectedProps()} />
+              <Checkbox defaultChecked={data[row.id].indexed} onChange={(e)=> updateIndexedRow(row.id, e.target.checked)}/>
             </div>
           ),
         },
@@ -159,8 +121,7 @@ const EnhancedTable = ({
           // to the render a checkbox
           Cell: ({ row }) => (
             <div>
-              {/*  {console.log(data)} */}
-              <Checkbox defaultChecked={data[row.id].worms} onChange={(e) => (setWormSelectedRow(row.id))}/>
+              <Checkbox defaultChecked={data[row.id].worms} onChange={(e) => (updateWormSelectedRow(row.id, e.target.checked))}/>
             </div>
           ),
         },
@@ -169,9 +130,6 @@ const EnhancedTable = ({
       ])
     }
   )
-  // *** Update selections *** 
-  updateWormChoice(wormSelectedRow)
-  updateSelectedRowIds(selectedRowIds)
 
   // Render the UI for your table
   return (
@@ -225,9 +183,7 @@ const EnhancedTable = ({
 EnhancedTable.propTypes = {
   columns: PropTypes.array.isRequired,
   data: PropTypes.array.isRequired,
-  updateMyData: PropTypes.func.isRequired,
   setData: PropTypes.func.isRequired,
-  skipPageReset: PropTypes.bool.isRequired,
 }
 
 export default EnhancedTable

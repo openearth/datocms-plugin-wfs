@@ -29,5 +29,12 @@ export function ExtractSelectedRowIds (selectedRowsObject) {
   return selectedRowIds
 }
 
+export function ExtractIndexedPropertiesBoolean(data) {
+  if (!data.length) {
+    return []
+  }
+  return data.map(({indexed}) => indexed )
+}
+
 
 

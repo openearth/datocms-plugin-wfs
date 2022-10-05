@@ -10,9 +10,13 @@ type Props = {
 
 export default function IndexableWfsProperties({ ctx }: Props) {
     
-  //ctx.setFieldValue(ctx.fieldPath, JSON.stringify(defaultValues))
-/*   console.log(ctx.formValues) */
-  return <Canvas ctx={ctx}><PropertiesTable formValues={ctx.formValues}/></Canvas>
+  
+  const updateSavedData = (data: string) => {
+    console.log(data)
+    ctx.setFieldValue(ctx.fieldPath, JSON.stringify(data))
+  }
+  
+  return <Canvas ctx={ctx}><PropertiesTable formValues={ctx.formValues} updateSavedData={updateSavedData}/></Canvas>
 }
 
 
@@ -22,16 +26,16 @@ export default function IndexableWfsProperties({ ctx }: Props) {
 example json
 [
   {
-    "index": 4,
+    "indexed": true,
     "property": "naam",
-    "worms": true,
+    "worms": false,
     "keywords": [
       "k1",
       "k2"
     ]
   },
   {
-    "index": 2,
+    "indexed": true,
     "property": "code",
     "worms": true,
     "keywords": [

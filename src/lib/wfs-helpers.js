@@ -26,7 +26,7 @@ export function ReadFeatureProperties(describeFeatureTypeResponse) {
   
   const filteredProperties = properties.filter((property)=> 
                                 property.type.includes('xsd:string'))
-                                .map(({ name })=>  { return { property: name, worms: false, keywords: [] }})
+                                .map(({ name })=>  { return { property: name, indexed: false, worms: false, keywords: [] }})
                                                                                     
   return filteredProperties
   
