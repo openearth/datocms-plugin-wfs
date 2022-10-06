@@ -1,3 +1,3 @@
-# [Your plugin name]
+# Layer keywords plugin based on WFS properties
 
-[Describe what your plugin does, and how users you can configure it! Screenshots are always welcome!]
+[Retrieves the properties of each Web Feature service.]
