@@ -73,21 +73,45 @@ const defaultColumn = {
 
 const EnhancedTable = ({
   columns,
-  data,
-  setData,
+  tableData,
   updateIndexedRow,
   updateWormSelectedRow, 
 }) => {
 
 
+  const data = React.useMemo(() => tableData, [tableData]);
+  const [firstTime, setFirstTime ] = React.useState(false)
+  const [indexedRows, setIndexedRows] = React.useState([])
+  const [wormSelectedRows, setWormSelectedRows] = React.useState([])
+
+  if (tableData.length && !firstTime) {
+    setFirstTime(true)
+    setIndexedRows(tableData.map(({indexed})=> indexed))
+  }
+  
+  const onUpdateIndexedRow = (id, checked) => {
+    updateIndexedRow(id, checked)
+    let updatedCheckedData = [...indexedRows]
+    updatedCheckedData[id] = !updatedCheckedData[id]
+    setIndexedRows(updatedCheckedData)
+  }
+
+  const onUpdateWormSelectedRow = (id, checked) => {
+    updateWormSelectedRow(id, checked)
+    let updatedData = [...wormSelectedRows]
+    updatedData[id] = !updatedData[id]
+    setWormSelectedRows(updatedData)
+  }
+
   const {
     getTableProps,
     headerGroups,
     prepareRow,
-    page,
+    rows,
   } = useTable(
     {
       columns,
+      //initialState: tableData,
       data,
       //initialState: indexedProperties,
       defaultColumn,
@@ -95,7 +119,6 @@ const EnhancedTable = ({
     
     useSortBy,
     usePagination,
-    useRowSelect,
     hooks => {
       hooks.allColumns.push(columns => [
         // Let's make a column for selection
@@ -108,7 +131,7 @@ const EnhancedTable = ({
           // to the render a checkbox
           Cell: ({ row }) => (     
             <div>
-              <Checkbox defaultChecked={data[row.id].indexed} onChange={(e)=> updateIndexedRow(row.id, e.target.checked)}/>
+              <Checkbox defaultChecked={indexedRows[row.id]} onChange={(e)=> onUpdateIndexedRow(row.id, e.target.checked)}/>
             </div>
           ),
         },
@@ -121,7 +144,7 @@ const EnhancedTable = ({
           // to the render a checkbox
           Cell: ({ row }) => (
             <div>
-              <Checkbox defaultChecked={data[row.id].worms} onChange={(e) => (updateWormSelectedRow(row.id, e.target.checked))}/>
+              <Checkbox defaultChecked={wormSelectedRows[row.id]} onChange={(e) => onUpdateWormSelectedRow(row.id, e.target.checked)}/>
             </div>
           ),
         },
@@ -158,7 +181,7 @@ const EnhancedTable = ({
           ))}
         </TableHead>
         <TableBody>
-          {page.map((row, i) => {
+          {rows.map((row) => {
             prepareRow(row)
             return (
               <TableRow {...row.getRowProps()}>

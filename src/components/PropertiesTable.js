@@ -2,7 +2,8 @@ import React, {useEffect} from 'react'
 import CssBaseline from '@mui/material/CssBaseline'
 import EnhancedTable from './EnhancedTable'
 import { DescribeFeatureType, GetFeaturePropertyKeywords, ReadFeatureProperties, ReadKeywordsFromWfsResponse } from '../lib/wfs-helpers'
-import { ExtractInitialSelectedRowsObject, ExtractInitialSelectedWormsValues, ExtractSelectedRowIds, ExtractIndexedPropertiesBoolean } from '../lib/helpers'
+import { GetAphiaIDByName, GetAphiaRecordByAphiaID } from '../lib/request-helpers'
+
 import _ from 'lodash';
 
 const PropertiesTable = ({ formValues, updateSavedData } ) =>  {
@@ -59,17 +60,26 @@ data state:
   return updatedData
   }
     
-   
+  const updateWormskeywordsOfData = (rowIndex, value, data) => {
+    console.log('was called')
+    const updatedData = [...data]
+    if (value === false) {
+      updatedData[rowIndex].worms = false
+      //need a function to clean the keywords from the worms
+      //updatedData[rowIndex].keywords = []
+      return updatedData
+    }
+    console.log(updatedData[rowIndex])
+    const keywords = _.get(updatedData[rowIndex], 'keywords')
+    
+    if (keywords.length) {
+      keywords.forEach(keyword => {
+        GetAphiaIDByName({keyword})
+          .then(response => GetAphiaRecordByAphiaID({id:response.data}))
+      })
+    }
+  }
   
-/*   const updateWormsBoolean = (selectedRowIds, data, ) => {
-    const selectedRowsIdsArray = Object.keys(selectedRowIds)
-    const updatedData = data.map((dataRow, index) => {
-      if (selectedRowsIdsArray.includes(index.toString()) {
-        dataRow.worms = 
-      }
-    })
-  } */
-
 
   
   //STATE
@@ -91,21 +101,20 @@ data state:
 
   const updateWormSelectedRow = (index, value) => {
     console.log(index, value)
+    updateWormskeywordsOfData(index, value, tableData)
+    //updateSavedData(tableData)
   }
 
   const updateIndexedRow = (index, value) => {
-    console.log(index,value)
     setTableData(updateWfsKeywordsOfData(index, value, tableData))
     updateSavedData(tableData)
   }
   
   return <div> 
       <CssBaseline />
-      {console.log(tableData)}
         <EnhancedTable
           columns={columns}
-          data={tableData}
-          setData={setTableData}
+          tableData={tableData}
           updateIndexedRow={updateIndexedRow}
           updateWormSelectedRow={updateWormSelectedRow}
       /></div>
