@@ -1,3 +1,3 @@
-# Layer keywords plugin based on WFS properties
+# Web Feature Service Plugin 
 
 [Retrieves the properties of each Web Feature service.]
