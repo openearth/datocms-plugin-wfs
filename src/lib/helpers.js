@@ -37,4 +37,11 @@ export function ExtractIndexedPropertiesBoolean(data) {
 }
 
 
+export function ExtractWormsKeywordsFromRecord(record) {
+  if (!record) {
+    return
+  } 
+  return [record.class, record.family, record.genus, record.kingdom, record.phylum, record.order]
+}
+
 

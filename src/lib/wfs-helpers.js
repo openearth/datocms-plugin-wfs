@@ -1,9 +1,10 @@
+import axios from 'axios'
+import { stringify } from 'query-string'
+
 /* 
   Function that implements the DescribeFeatureType operation of the WFS protocol
   Return a json with all the attributes of the feature
 */
-import axios from 'axios'
-import { stringify } from 'query-string'
 
 function BuildGeoServerUrl({ url, service, request, encode = true, width = 256, height = 256, ...rest }) {
   if (!service || !request) {
@@ -49,7 +50,7 @@ export async function DescribeFeatureType ({url, layer, downloadLayer}) {
 }
 
 /* 
-  Function that creates the getFeature request based on the propertyName
+  Function that creates the getFeature request based on the propertyName, used to retreive keywords
 */
 export async function GetFeaturePropertyKeywords ({url, layer, downloadLayer, propertyName}) {
   
