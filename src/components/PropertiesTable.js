@@ -20,14 +20,11 @@ const PropertiesTable = ({ formValues, updateSavedData } ) =>  {
   const [tableData, setTableData] = React.useState([])
   const {download_layer, layer, url, indexable_wfs_properties} = formValues
   
-  //Initial properties as saved in DatoCMS
-  /*   initialSelectedRows example:  {'selectedRowIds': {
-                                                          2:true 
-                                                          4: true   }}
-   */
-  
-  const defaultTableData = JSON.parse(indexable_wfs_properties)
-  console.log('defaultTableData', defaultTableData)
+  let defaultTableData = []
+  if (indexable_wfs_properties) {
+    defaultTableData = JSON.parse(indexable_wfs_properties)
+  }
+ 
   const setDefaultTableData = () => {
     setTableData(defaultTableData)
   }
@@ -97,7 +94,8 @@ const PropertiesTable = ({ formValues, updateSavedData } ) =>  {
   }
   
   const getProperties = () => {
-    if (tableData) {
+    
+    if (tableData.length) {
       return
     }
     DescribeFeatureType({url, layer, downloadLayer:download_layer})
