@@ -10,6 +10,7 @@ type Props = {
 
 export default function IndexableWfsProperties({ ctx }: Props) {
   const updateSavedData = (data: string) => {
+    console.log('updateSavedData in IndexableWfsProperties', data)
     ctx.setFieldValue(ctx.fieldPath, JSON.stringify(data))
   }
   
