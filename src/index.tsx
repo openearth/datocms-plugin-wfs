@@ -9,9 +9,9 @@ connect({
       {
         id: 'indexableWfsProperties',
         name: 'Indexable WFS Properties',
-        type: 'editor', // other option is addon. Addon is used to add information to the field.
+        type: 'editor', 
         fieldTypes: [
-          'json' // we want to attach it only to a json field type
+          'json' 
         ],
       },
     ];
