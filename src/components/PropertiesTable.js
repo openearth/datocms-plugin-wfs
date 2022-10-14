@@ -19,7 +19,7 @@ const PropertiesTable = ({ formValues, updateSavedData } ) =>  {
    //STATE
   const [tableData, setTableData] = React.useState([])
   const [wormsPending, setWormsPending] = React.useState(false)
-  const {download_layer, layer, url, indexable_wfs_properties_local} = formValues
+  const {download_layer, layer, url, indexable_wfs_properties} = formValues
 
  
   const updateWfsKeywordsOfData = (rowIndex, value, data) => {
@@ -83,8 +83,8 @@ const PropertiesTable = ({ formValues, updateSavedData } ) =>  {
   }
   
   const getProperties = () => {
-    if (indexable_wfs_properties_local) {
-      setTableData(JSON.parse(indexable_wfs_properties_local))  
+    if (indexable_wfs_properties) {
+      setTableData(JSON.parse(indexable_wfs_properties))  
     }else {
       DescribeFeatureType({url, layer, downloadLayer:download_layer})
       .then(response => ReadFeatureProperties(response.data))
