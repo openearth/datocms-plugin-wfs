@@ -1,41 +1,4 @@
-export function ExtractInitialSelectedRowsObject(pluginProperties) {
-  if (!pluginProperties.length) {
-    return 
-  }
-  const indeces = pluginProperties.map(({index}) => {
-    const selectedRow ={}
-    selectedRow[index] = true
-    return selectedRow
-  })
-  
-  return {
-    selectedRowIds: Object.assign({}, ...indeces)
-  }  
-}
-
-export function ExtractInitialSelectedWormsValues(pluginProperties) {
-    if (!pluginProperties.length) {
-    return 
-  }
-
-  return pluginProperties.map(({worms}) => worms)
-}
-
-export function ExtractSelectedRowIds (selectedRowsObject) {
-  if (!selectedRowsObject) {
-    return []
-  }
-  const {selectedRowIds} = selectedRowsObject
-  return selectedRowIds
-}
-
-export function ExtractIndexedPropertiesBoolean(data) {
-  if (!data.length) {
-    return []
-  }
-  return data.map(({indexed}) => indexed )
-}
-
+import _ from 'lodash'
 
 export function ExtractWormsKeywordsFromRecord(record) {
   if (!record) {
@@ -45,3 +8,22 @@ export function ExtractWormsKeywordsFromRecord(record) {
 }
 
 
+export function ExtractWormsKeywordsFromVernacularRecord(record) {
+  if (!record.length) {
+    return []
+  }
+  let langKeywords = []
+  record.forEach(({language_code, vernacular}) => {
+   if (language_code === 'eng' ||
+           language_code === 'dan' ||
+           language_code === 'fra' ||
+           language_code === 'deu' ||
+           language_code === 'dut') {
+     langKeywords = [...langKeywords, vernacular]
+   } 
+
+})
+
+
+return langKeywords
+}

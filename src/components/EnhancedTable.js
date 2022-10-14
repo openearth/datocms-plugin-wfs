@@ -46,27 +46,30 @@ const EnhancedTable = ({
     let updatedData = [...wormSelectedRows]
     updatedData[id] = !updatedData[id]
     setWormSelectedRows(updatedData)
+    if (checked === false) {
+      let updatedIndexedData = [...indexedRows]
+      updatedIndexedData[id] = !updatedIndexedData[id]
+      setIndexedRows(updatedIndexedData)
+    }
     setLastUpdatedWormRow(id)
   }
 
-/* <Checkbox defaultChecked={false} /> */
   // Render the UI for your table
   return (
     <TableContainer>
-      {console.log('wormsPending', wormsPending)}
       <MaUTable>
       <TableHead>
         <TableRow>
           <TableCell >Indexed</TableCell>
-          <TableCell  >Worms</TableCell>
-          <TableCell  >Property</TableCell>
+          <TableCell >Worms</TableCell>
+          <TableCell >Property</TableCell>
         </TableRow>
         </TableHead>
         <TableBody>
           {data.map((row, index)=> (
             <TableRow key={row.property}>
             <TableCell><Checkbox checked={indexedRows[index]} onChange={(e) => onUpdateIndexedRow(index, e.target.checked)}  /></TableCell>
-            {(wormsPending && lastUpdatedWormRow === index) ? <TableCell><CircularProgress/></TableCell> : <TableCell><Checkbox checked={wormSelectedRows[index]}  onChange={(e) => onUpdateWormSelectedRow(index, e.target.checked)} /></TableCell>}
+            {(wormsPending && lastUpdatedWormRow === index) ? <TableCell><CircularProgress/></TableCell> : <TableCell><Checkbox checked={wormSelectedRows[index]} disabled={!indexedRows[index]} onChange={(e) => onUpdateWormSelectedRow(index, e.target.checked)} /></TableCell>}
             <TableCell>{row.property}</TableCell>
           </TableRow>
           ))}

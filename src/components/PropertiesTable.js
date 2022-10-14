@@ -2,8 +2,8 @@ import React, {useEffect} from 'react'
 import CssBaseline from '@mui/material/CssBaseline'
 import EnhancedTable from './EnhancedTable'
 import { DescribeFeatureType, GetFeaturePropertyKeywords, ReadFeatureProperties, ReadKeywordsFromWfsResponse } from '../lib/wfs-helpers'
-import { GetAphiaIDByName, GetAphiaRecordByAphiaID } from '../lib/request-helpers'
-import { ExtractWormsKeywordsFromRecord } from '../lib/helpers'
+import { GetAphiaIDByName, GetAphiaRecordByAphiaID, GetAphiaVernacularsByAphiaID } from '../lib/request-helpers'
+import { ExtractWormsKeywordsFromRecord, ExtractWormsKeywordsFromVernacularRecord } from '../lib/helpers'
 
 import _ from 'lodash';
 
@@ -18,6 +18,7 @@ const PropertiesTable = ({ formValues, updateSavedData } ) =>  {
   ]
    //STATE
   const [tableData, setTableData] = React.useState([])
+  const [stringFormatTableData, setStringFormatTableData] = React.useState([])
   const [wormsPending, setWormsPending] = React.useState(false)
   const {download_layer, layer, url, indexable_wfs_properties} = formValues
 
@@ -41,35 +42,52 @@ const PropertiesTable = ({ formValues, updateSavedData } ) =>  {
   }
 
   const GetWormsRecordKeywords = async function (keyword) {
+    let aphiaId;
+    try {
+      aphiaId = await GetAphiaIDByName({ keyword });
+    } catch(error) {
+      aphiaId = null;
+    }
+    
+    if (!aphiaId) {
+      return []
+    }
 
-    const aphiaId = await GetAphiaIDByName({ keyword });
-    let aphiaRecord;
+    let aphiaVernacularsKeywords; 
+    try {
+      aphiaVernacularsKeywords = await GetAphiaVernacularsByAphiaID({id: aphiaId});
+    } catch (error) {
+      aphiaVernacularsKeywords = {}
+    }
+    
+    
+    let aphiaRecord ;
     try {
       aphiaRecord = await GetAphiaRecordByAphiaID({ id: aphiaId });
     } catch (error) {
       aphiaRecord = {};
     }
-    return ExtractWormsKeywordsFromRecord(aphiaRecord);
+
+    return [...ExtractWormsKeywordsFromRecord(aphiaRecord), ...ExtractWormsKeywordsFromVernacularRecord(aphiaVernacularsKeywords)];
   };
     
   
   async function updateWormskeywordsOfData (rowIndex, value, data) {
-    setWormsPending(true)
+    
     const updatedData = [...data]
     if (value === false) {
       updatedData[rowIndex].worms = false
-      //need a function to clean the keywords from the worms
-      //updatedData[rowIndex].keywords = []
+      updatedData[rowIndex].indexed = false
+      updatedData[rowIndex].keywords = []
       return updatedData
     }
-    
+    setWormsPending(true)
     const keywords = _.get(updatedData[rowIndex], 'keywords')
     
     let wormsKeywords = []
     if (keywords.length) {
     for await (const keyword of keywords) {
       const recordKeywords = await GetWormsRecordKeywords(keyword);
-      
       wormsKeywords = [...wormsKeywords, ...recordKeywords];
      
     }
@@ -84,11 +102,15 @@ const PropertiesTable = ({ formValues, updateSavedData } ) =>  {
   
   const getProperties = () => {
     if (indexable_wfs_properties) {
-      setTableData(JSON.parse(indexable_wfs_properties))  
+      setTableData(JSON.parse(indexable_wfs_properties)) 
+      setStringFormatTableData(indexable_wfs_properties) 
     }else {
       DescribeFeatureType({url, layer, downloadLayer:download_layer})
       .then(response => ReadFeatureProperties(response.data))
-      .then(updatedData => setTableData(updatedData))
+      .then(updatedData => {
+        setTableData(updatedData)
+        setStringFormatTableData(JSON.stringify(updatedData))
+      })
       .catch(() => undefined) 
     }
   }
@@ -98,20 +120,24 @@ const PropertiesTable = ({ formValues, updateSavedData } ) =>  {
 
 
   async function updateWormSelectedRow (index, value)  {
-    console.log('updateWormedIndex', index)
     const updatedData = await updateWormskeywordsOfData(index, value, tableData)
     setTableData(updatedData)
+    setStringFormatTableData(JSON.stringify(updatedData))
     updateSavedData(tableData)
   }
 
   const updateIndexedRow = (index, value) => {
-    console.log('updateIndexedRow', index)
-    setTableData(updateWfsKeywordsOfData(index, value, tableData))
+    const updatedData = updateWfsKeywordsOfData(index, value, tableData)
+    setTableData(updatedData)
+    setTimeout(()=> setStringFormatTableData(JSON.stringify(updatedData)), 1000)
     updateSavedData(tableData)
   }
   
+  
+
   return <div> 
       <CssBaseline />
+      {/* {console.log(tableData)} */}
         <EnhancedTable
           columns={columns}
           tableData={tableData}
@@ -124,7 +150,7 @@ const PropertiesTable = ({ formValues, updateSavedData } ) =>  {
           Stored keywords
         </h1>
       <p>
-        {JSON.stringify(tableData)}
+        {stringFormatTableData}
       </p>
       </div>
     
