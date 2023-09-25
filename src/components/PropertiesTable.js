@@ -23,7 +23,7 @@ const PropertiesTable = ({ formValues, updateSavedData } ) =>  {
   const {download_layer, layer, url, indexable_wfs_properties} = formValues
 
  
-  const updateWfsKeywordsOfData = (rowIndex, value, data) => {
+  const updateWfsKeywordsOfData = async (rowIndex, value, data) => {
 
     const updatedData = [...data]
     if (value === false) {
@@ -32,13 +32,13 @@ const PropertiesTable = ({ formValues, updateSavedData } ) =>  {
       return updatedData
     }
   
-  GetFeaturePropertyKeywords({url, layer, downloadLayer:download_layer, propertyName: updatedData[rowIndex].property})
-          .then(response => ReadKeywordsFromWfsResponse(response.data, updatedData[rowIndex].property ))
-          .then(keywords => {
-            updatedData[rowIndex].indexed = true
-            updatedData[rowIndex].keywords = keywords
-          })
-  return updatedData
+    const response = await GetFeaturePropertyKeywords({url, layer, downloadLayer:download_layer, propertyName: updatedData[rowIndex].property})
+    const keywords = ReadKeywordsFromWfsResponse(response.data, updatedData[rowIndex].property )
+
+    updatedData[rowIndex].indexed = true
+    updatedData[rowIndex].keywords = keywords
+
+    return updatedData
   }
 
   const GetWormsRecordKeywords = async function (keyword) {
@@ -126,13 +126,12 @@ const PropertiesTable = ({ formValues, updateSavedData } ) =>  {
     updateSavedData(tableData)
   }
 
-  const updateIndexedRow = (index, value) => {
-    const updatedData = updateWfsKeywordsOfData(index, value, tableData)
+  async function updateIndexedRow (index, value) {
+    const updatedData = await updateWfsKeywordsOfData(index, value, tableData)
     setTableData(updatedData)
-    setTimeout(()=> setStringFormatTableData(JSON.stringify(updatedData)), 1000)
+    setStringFormatTableData(JSON.stringify(updatedData))
     updateSavedData(tableData)
   }
-  
   
 
   return <div> 
